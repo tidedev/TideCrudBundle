@@ -1,6 +1,6 @@
 <?php
 
-namespace Tide\CrudBundle\Controller;
+namespace Tide\TideCrudBundle\Controller;
 
 use Doctrine\Orm\EntityRepository;
 

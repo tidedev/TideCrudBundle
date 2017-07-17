@@ -1,5 +1,5 @@
 <?php
-namespace Tide\CrudBundle\Tests\Controller;
+namespace Tide\TideCrudBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 

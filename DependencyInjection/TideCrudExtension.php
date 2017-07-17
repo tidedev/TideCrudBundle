@@ -1,6 +1,6 @@
 <?php
 
-namespace Tide\CrudBundle\DependencyInjection;
+namespace Tide\TideCrudBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;

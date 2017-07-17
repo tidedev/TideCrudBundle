@@ -1,6 +1,6 @@
 services:
     tidecrud.twig_extension:
-        class: Tide\CrudBundle\Twig\CrudExtension
+        class: Tide\TideCrudBundle\Twig\CrudExtension
         arguments: ["@property_accessor"]
         tags:
             - { name: twig.extension }

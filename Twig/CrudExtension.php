@@ -1,5 +1,5 @@
 <?php
-namespace Tide\CrudBundle\Twig;
+namespace Tide\TideCrudBundle\Twig;
 
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 

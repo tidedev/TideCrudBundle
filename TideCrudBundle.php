@@ -1,6 +1,6 @@
 <?php
 
-namespace Tide\CrudBundle;
+namespace Tide\TideCrudBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
