@@ -16,7 +16,8 @@
   "require" : {
     "php": ">=5.5.9",
     "symfony/framework-bundle": "~2.7|~3.0",
-    "twig/twig":                "~1.12|~2"
+    "twig/twig":                "~1.12|~2",
+    "tide/tidecrudbundle": "dev-master"
   },
   "autoload": {
     "psr-4": { "Tide\\TideCrudBundle\\": "" },
