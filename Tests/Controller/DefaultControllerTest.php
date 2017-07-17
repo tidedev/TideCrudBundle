@@ -1,6 +1,5 @@
 <?php
-
-namespace Madcode\MDCCrudBundle\Tests\Controller;
+namespace Tide\CrudBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 

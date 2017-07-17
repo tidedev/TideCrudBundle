@@ -1,10 +1,8 @@
 <?php
 
-namespace Tide\CrudBundle\DependencyInjection;
-
+namespace Tide\CrudBundle\Controller;
 
 use Doctrine\ORM\EntityRepository;
-
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -56,7 +54,7 @@ abstract class CrudController extends Controller
 	 * @return string
 	 */
 	public function getBaseTwigs(){
-		return "@MDCCrud/default";
+		return "@TideCrud/default";
 	}
 
 	public function prePersistNew($entity, Request $request){

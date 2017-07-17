@@ -1,5 +1,5 @@
 <?php
-namespace Tide\CrudBundle\DependencyInjection;
+namespace Tide\CrudBundle\Twig;
 
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
@@ -28,7 +28,7 @@ class CrudExtension extends \Twig_Extension
 		$fieldName = $fieldMetadata['name'];
 		$fieldMetadata["value"] =  $this->propertyAccessor->getValue($item, $fieldName);
 		$fieldType = gettype($fieldMetadata["value"]);
-		return $twig->render("@MDCCrud/default/fields/".$fieldType.".html.twig", $fieldMetadata);
+		return $twig->render("@TideCrud/default/fields/".$fieldType.".html.twig", $fieldMetadata);
 	}
 
 
