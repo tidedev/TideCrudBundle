@@ -25,6 +25,7 @@ abstract class CrudController extends Controller
 	abstract function getShowFields();
 
 
+
 	/**
 	 * @return object
 	 */
