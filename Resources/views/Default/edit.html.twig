@@ -1,0 +1,15 @@
+{% extends '@App/Common/baseAdminPannel.html.twig' %}
+
+    {% block title %}
+        {{"Edit"|trans}} {{entityName|trans}}
+    {% endblock %}
+
+    {% block body %}
+    {{ form_start(edit_form, {'attr':{'data-remote':'true', 'data-method':'POST', 'data-url':edit_form.vars.action, 'data-redirect':path('traveler_dashboard')~'#'~path(entityName~'_index')}}) }}
+    {{ form_widget(edit_form) }}
+        <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i>
+            {{"Update"|trans}} {{entityName|trans}}
+            <div class="ripple-container"></div>
+        </button>
+    {{ form_end(edit_form) }}
+    {% endblock %}

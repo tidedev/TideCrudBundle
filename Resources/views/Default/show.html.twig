@@ -1,0 +1,26 @@
+{% extends '@App/Common/baseAdminPannel.html.twig' %}
+
+    {% block title %}
+    Mostrar {{ entityName|trans }}
+    {% endblock %}
+    {% block subtitle %}{% endblock %}
+
+    {% block body %}
+
+    <table class="table table-hover">
+        <tbody>
+            {% for field in fields %}
+                <tr>
+                    <th>{{field.name}}</th>
+                    <td> {{ renderEntityField(entity, field) }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a class="loader" data-action="{{ path(entityName~'_edit', { 'id': entity.id }) }}">
+        <button type="button" class="btn btn-primary">
+            <i class="fa fa-save"></i> {{"Edit"|trans}} {{entityName|trans}}<div class="ripple-container"></div>
+        </button>
+    </a>
+    {% endblock %}

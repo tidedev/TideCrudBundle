@@ -1,0 +1,42 @@
+{% extends '@App/Common/baseAdminPannel.html.twig' %}
+
+    {% block title %}
+        {{entityName|capitalize}}
+    {% endblock %}
+
+    {% block body %}
+        <div class="card-content table-responsive">
+            <table data-unique-id="id" id='assignedballots' class="table table-hover" data-toggle="table" data-search="true" data-show-columns="true">
+            <thead>
+
+                <tr>
+                    <th data-field="id" data-visible="false">ID</th>
+
+                    {% for field in fields %}
+                        <th data-sortable="true" data-field="{{ field.name }}">{{ field.name }}</th>
+                    {% endfor %}
+                    <th>{{ "Actions"|trans  }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for entity in entities %}
+
+                    <tr>
+                        <td>{{ entity.id }}</td>
+
+                        {% for field in fields %}
+                            <td>
+                                {{ renderEntityField(entity, field) }}
+                            </td>
+                        {% endfor %}
+                        <td>
+                            <a class="loadinmodal" data-action="{{ path(entityName~'_show', { 'id': entity.id }) }}"><i class="fa fa-eye"></i></a>
+                            <a class="loader" data-action="{{ path(entityName~'_edit', { 'id': entity.id }) }}"><i class="fa fa-edit"></i></a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+{% endblock %}

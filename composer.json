@@ -1,0 +1,32 @@
+{
+  "name" : "tide/tidecrudbundle",
+  "description" : "A bundle to perform automated crud actions to entities, includes pagination.",
+  "type" : "symfony-bundle",
+  "minimum-stability":"dev",
+  "authors" : [{
+    "name" : "David",
+    "email" : "daalcala@gmail.com"
+  }],
+  "keywords" : [
+    "crud"
+  ],
+  "license" : [
+    "MIT"
+  ],
+  "require" : {
+    "php": ">=5.5.9",
+    "symfony/framework-bundle": "~2.7|~3.0",
+    "twig/twig":                "~1.12|~2",
+    "madcode/mdccrudbundle": "dev-master"
+  },
+  "autoload": {
+    "psr-4": { "Tide\\TideCrudBundle\\": "" },
+    "exclude-from-classmap": ["/Tests/"]
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.0.x-dev"
+    }
+  }
+
+}

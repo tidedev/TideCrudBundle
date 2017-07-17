@@ -1,0 +1,6 @@
+services:
+    mdccrud.twig_extension:
+        class: Madcode\MDCCrudBundle\Twig\CrudExtension
+        arguments: ["@property_accessor"]
+        tags:
+            - { name: twig.extension }
