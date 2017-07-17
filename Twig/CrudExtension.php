@@ -34,6 +34,6 @@ class CrudExtension extends \Twig_Extension
 
 	public function getName()
 	{
-		return 'mdccrud_extension';
+		return 'tidecrud_extension';
 	}
 }
