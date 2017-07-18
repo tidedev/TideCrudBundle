@@ -95,7 +95,7 @@ class CrudHelper {
 	}
 
 
-	private function tableSerialization($entities, $fields){
+	public function tableSerialization($entities, $fields){
 		//$fields = ["id", "folio", "person.names", "lastStatusString", "campaign.name", "userOpc.username",  "userOperator.username", "assignedDate"];
 		$result = [];
 		foreach ($entities as $entity){

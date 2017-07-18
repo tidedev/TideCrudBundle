@@ -114,8 +114,9 @@ abstract class CrudController extends Controller
 				'entityName' => $this->getEntityName(),
 				'fields' => $this->getFieldsMetadata($this->getListFields())
 				));
-		}else{
-			return new JsonResponse( $pagination );
+		}
+		else{
+			return new JsonResponse( ["total"=>$pagination["total"], "rows"=>$this->get("tidecrud.crud_helper")->tableSerialization($pagination["rows"], $this->getListFields())] );
 		}
 
 	}

@@ -1,6 +1,7 @@
 <?php
 namespace Tide\TideCrudBundle\Twig;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Tide\TideCrudBundle\Helpers\CrudHelper;
 
@@ -8,9 +9,9 @@ class CrudExtension extends \Twig_Extension
 {
 	private $crudHelper;
 
-	public function __construct(CrudHelper $crudHelper)
+	public function __construct(ContainerInterface $container)
 	{
-		$this->crudHelper = $crudHelper;
+		$this->crudHelper = $container->get("tidecrud.crud_helper");
 	}
 
 
