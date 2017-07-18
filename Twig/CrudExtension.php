@@ -2,18 +2,15 @@
 namespace Tide\TideCrudBundle\Twig;
 
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Tide\TideCrudBundle\Helpers\CrudHelper;
 
 class CrudExtension extends \Twig_Extension
 {
-	/** @var PropertyAccessor */
-	private $propertyAccessor;
+	private $crudHelper;
 
-	/** @var \Twig_Environment */
-	private $twig;
-
-	public function __construct(PropertyAccessor $propertyAccessor)
+	public function __construct(CrudHelper $crudHelper)
 	{
-		$this->propertyAccessor = $propertyAccessor;
+		$this->crudHelper = $crudHelper;
 	}
 
 
@@ -23,12 +20,8 @@ class CrudExtension extends \Twig_Extension
 		);
 	}
 
-	public function renderEntityField(\Twig_Environment $twig, $item, $fieldMetadata){
-		$this->twig = $twig;
-		$fieldName = $fieldMetadata['name'];
-		$fieldMetadata["value"] =  $this->propertyAccessor->getValue($item, $fieldName);
-		$fieldType = gettype($fieldMetadata["value"]);
-		return $twig->render("@TideCrud/default/fields/".$fieldType.".html.twig", $fieldMetadata);
+	public function renderEntityField($item, $fieldMetadata){
+		return $this->crudHelper->renderEntityField($item, $fieldMetadata);
 	}
 
 

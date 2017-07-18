@@ -1,6 +1,9 @@
 services:
+    tidecrud.form_serializer:
+        class: Tide\TideCrudBundle\Helpers\FormErrorsSerializer
+    tidecrud.crud_helper:
+        class: Tide\TideCrudBundle\Helpers\CrudHelper
+        arguments: ["@service_container"]
     tidecrud.twig_extension:
         class: Tide\TideCrudBundle\Twig\CrudExtension
-        arguments: ["@property_accessor"]
-        tags:
-            - { name: twig.extension }
+        arguments: ["@tidecrud.crud_helper"]

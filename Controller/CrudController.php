@@ -4,6 +4,7 @@ namespace Tide\TideCrudBundle\Controller;
 
 use Doctrine\Orm\EntityRepository;
 
+use Doctrine\ORM\QueryBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 
@@ -17,13 +18,17 @@ abstract class CrudController extends Controller
 	/**
 	 * @return array
 	 */
-	abstract function getTableFields();
+	abstract function getListFields();
 
 	/**
 	 * @return array
 	 */
 	abstract function getShowFields();
 
+	/**
+	 * @return array
+	 */
+	abstract function getSearchFields();
 
 
 	/**
@@ -34,7 +39,7 @@ abstract class CrudController extends Controller
 	/**
 	 * @return FormType
 	 */
-	abstract function getEntityForm();
+	abstract function getEntityFormClass();
 
 	/**
 	 * @return EntityRepository
@@ -52,26 +57,33 @@ abstract class CrudController extends Controller
 	}
 
 	/**
-	 * @return string
+	 * @return array
 	 */
-	public function getBaseTwigs(){
-		return "@TideCrud/default";
+	public function getCrudTwigs(){
+		$default = [
+			"list"=>"@TideCrud/default/list.html.twig",
+			"show"=>"@TideCrud/default/show.html.twig",
+			"new"=>"@TideCrud/default/new.html.twig",
+			"edit"=>"@TideCrud/default/edit.html.twig",
+		];
+		//return array_merge($default,$crudTwigs);
+		return $default;
 	}
 
 	public function prePersistNew($entity, Request $request){
-		//todo: Implementar este metodo para hacer algo con la entidad antes de persistirla en base de datos
+		//Implementar este metodo para hacer algo con la entidad antes de persistirla en base de datos
 	}
 
 	public function postPersistNew($entity, Request $request){
-		//todo: Implementar este metodo para hacer algo con la entidad después de persistirla en base de datos
+		//Implementar este metodo para hacer algo con la entidad después de persistirla en base de datos
 	}
 
 	public function prePersistEdit($entity, Request $request){
-		//todo: Implementar este metodo para hacer algo con la entidad antes de persistirla en base de datos
+		//Implementar este metodo para hacer algo con la entidad antes de persistirla en base de datos
 	}
 
 	public function postPersistEdit($entity, Request $request){
-		//todo: Implementar este metodo para hacer algo con la entidad después de persistirla en base de datos
+		//Implementar este metodo para hacer algo con la entidad después de persistirla en base de datos
 	}
 
 	/**
@@ -85,26 +97,34 @@ abstract class CrudController extends Controller
 		return strtolower((new \ReflectionClass($this->getNewEntity()))->getShortName());
 	}
 
+	private function getEntityClassName(){
+		return (new \ReflectionClass($this->getNewEntity()))->getName();
+	}
 	/**
 	 * Lists all entities.
 	 */
-	public function indexAction()
+	public function listAction(Request $request, $responseType="html", QueryBuilder $customDql = null)
 	{
+		$filters = $this->getRequestFilters($request);
+		$pagination = $this->get("tidecrud.crud_helper")->paginate($this->getEntityClassName(),$customDql, $filters);
 
-		$entities = $this->getRepository()->findAll();
+		if($responseType=="html"){
+			return $this->render($this->getCrudTwigs()["list"], array(
+				'entities' => $pagination["rows"],
+				'entityName' => $this->getEntityName(),
+				'fields' => $this->getFieldsMetadata($this->getListFields())
+				));
+		}else{
+			return new JsonResponse( $pagination );
+		}
 
-		return $this->render($this->getBaseTwigs().'/index.html.twig', array(
-			'entities' => $entities,
-			'entityName' => $this->getEntityName(),
-			'fields' => $this->getFieldsMetadata($this->getTableFields())
-			));
 	}
 
 
 	public function newAction(Request $request)
 	{
 		$entity = $this->getNewEntity();
-		$form = $this->createForm($this->getEntityForm(), $entity, ["action"=>$this->generateUrl($this->getEntityName().'_new'), "method"=>"post"]);
+		$form = $this->createForm($this->getEntityFormClass(), $entity, ["action"=>$this->generateUrl($this->getEntityName().'_new'), "method"=>"post"]);
 		$form->handleRequest($request);
 		$translator = $this->get('translator');
 
@@ -118,14 +138,14 @@ abstract class CrudController extends Controller
 					$this->postPersistNew($entity, $request);
 					return new JsonResponse( array( 'response' => 'success', 'message' => ucfirst($translator->trans($this->getEntityName())). $translator->trans('creado') ) );
 				} else {
-					$errors = $this->get( 'app.form_serializer' )->serializeFormErrors( $form, true, true );
+					$errors = $this->get( 'tidecrud.form_serializer' )->serializeFormErrors( $form, true, true );
 					return new JsonResponse( array( 'response' => 'error', 'errors' => $errors ) );
 				}
 
 			}
 		}
 
-		return $this->render($this->getBaseTwigs().'/new.html.twig', array(
+		return $this->render($this->getCrudTwigs()["new"], array(
 			'entity' => $entity,
 			'entityName' => $this->getEntityName(),
 			'form' => $form->createView(),
@@ -140,7 +160,7 @@ abstract class CrudController extends Controller
 	public function showAction($id)
 	{
 		$entity = $this->getRepository()->find($id);
-		return $this->render($this->getBaseTwigs().'/show.html.twig', array(
+		return $this->render($this->getCrudTwigs()["show"], array(
 			'entity' => $entity,
 			'entityName' => $this->getEntityName(),
 			'fields' => $this->getFieldsMetadata($this->getShowFields())
@@ -155,7 +175,7 @@ abstract class CrudController extends Controller
 	public function editAction(Request $request, $id)
 	{
 		$entity = $this->getRepository()->find($id);
-		$editForm = $this->createForm($this->getEntityForm(), $entity, ["action"=>$this->generateUrl($this->getEntityName().'_edit', ["id"=>$entity->getId()]), "method"=>"post"]);
+		$editForm = $this->createForm($this->getEntityFormClass(), $entity, ["action"=>$this->generateUrl($this->getEntityName().'_edit', ["id"=>$entity->getId()]), "method"=>"post"]);
 		$editForm->handleRequest($request);
 
 		if(!$request->request->get("rebuild")) {
@@ -168,14 +188,14 @@ abstract class CrudController extends Controller
 					$translator = $this->get('translator');
 					return new JsonResponse( array( 'response' => 'success', 'message' => ucfirst($translator->trans($this->getEntityName())). $translator->trans('actualizado') ) );
 				} else {
-					$errors = $this->get( 'app.form_serializer' )->serializeFormErrors( $editForm, true, true );
+					$errors = $this->get( 'tidecrud.form_serializer' )->serializeFormErrors( $editForm, true, true );
 
 					return new JsonResponse( array( 'response' => 'error', 'errors' => $errors ) );
 				}
 			}
 		}
 
-		return $this->render($this->getBaseTwigs().'/edit.html.twig', array(
+		return $this->render($this->getCrudTwigs()["edit"], array(
 			'entity' => $entity,
 			'entityName' => $this->getEntityName(),
 			'edit_form' => $editForm->createView()
@@ -194,6 +214,24 @@ abstract class CrudController extends Controller
 		$em->flush();
 		$translator = $this->get('translator');
 		return new JsonResponse(array('response' => 'success', 'message' =>  ucfirst($translator->trans($this->getEntityName())). $translator->trans('eliminado') ));
+	}
+
+	private function  getRequestFilters(Request $request){
+		//todo: validar los filtros
+		$filters = [];
+		/*
+	     * @QueryParam(name="order", description="Filter ballots by folio ASC or DESC", requirements="asc|desc", strict=true,nullable=true,  allowBlank=true, default="ASC")
+		 * @QueryParam(name="sort", description="Filter ballots by field ASC or DESC", strict=true,nullable=true,  allowBlank=true)
+		 * @QueryParam(name="limit", description="Limit the numer of users returned", requirements="\d+", strict=true,nullable=true,  allowBlank=true, default=null)
+		 * @QueryParam(name="offset", description="Start offset", requirements="\d+", strict=true,nullable=true,  allowBlank=true, default=null)
+		 * @QueryParam(name="search", description="Start offset", allowBlank=true, default=null)
+		 */
+		$filters["order"] = $request->query->get("order");
+		$filters["sort"] = $request->query->get("sort");
+		$filters["limit"] = $request->query->get("limit");
+		$filters["offset"] = $request->query->get("offset");
+		$filters["search"] = $request->query->get("search");
+		return $filters;
 	}
 
 }
