@@ -5,6 +5,12 @@
     {% endblock %}
 
     {% block body %}
+        <a class="loader" data-action="{{ path(entityName~'_new') }}">
+            <button type="submit" class="btn btn-primary">
+                Crear {{entityName}}
+                <div class="ripple-container"></div>
+            </button>
+        </a>
         <div class="card-content table-responsive">
             <table data-unique-id="id" id='assignedballots' class="table table-hover" data-toggle="table" data-search="true" data-show-columns="true">
                 <thead>

@@ -1,9 +1,12 @@
 <?php
 namespace Tide\TideCrudBundle\Helpers;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Guzzle\Common\Exception\ExceptionCollection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -25,7 +28,7 @@ class CrudHelper {
 	public function renderEntityField($item, $field){
 		$propertyAccessor = $this->propertyAccessor;
 		try{
-			$fieldMetadata["value"] =  $propertyAccessor->getValue($item, $field["name"]);
+			$fieldMetadata["value"] =  $propertyAccessor->getValue($item, $field);
 		}
 		catch (\Exception $e){
 			$fieldMetadata["value"] = null;
@@ -35,6 +38,16 @@ class CrudHelper {
 
 		if($fieldMetadata["value"] instanceof \DateTime)
 			$fieldType = "datetime";
+
+        if($fieldMetadata["value"] instanceof PersistentCollection){
+            $fieldType = "arrayCollection";
+            try{
+                $fieldMetadata["value"] = call_user_func([$item, "get".strtoupper($field)."AsString"], []);
+            }catch (\Exception $e){
+                throw new ExceptionCollection("You have to implement method toString in collection");
+            }
+
+        }
 
 		return $this->templating->render(self::BASE_TWIGS."/fields/".$fieldType.".html.twig", $fieldMetadata);
 	}

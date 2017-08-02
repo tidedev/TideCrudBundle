@@ -22,7 +22,7 @@ class CrudExtension extends \Twig_Extension
 	}
 
 	public function renderEntityField(\Twig_Environment $twig, $item, $fieldMetadata){
-		return $this->container->get("tidecrud.crud_helper")->renderEntityField($item, $fieldMetadata);
+		return $this->container->get("tidecrud.crud_helper")->renderEntityField($item, $fieldMetadata["name"]);
 	}
 
 
