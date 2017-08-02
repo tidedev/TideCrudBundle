@@ -25,7 +25,7 @@ class CrudHelper {
 	public function renderEntityField($item, $field){
 		$propertyAccessor = $this->propertyAccessor;
 		try{
-			$fieldMetadata["value"] =  $propertyAccessor->getValue($item, $field);
+			$fieldMetadata["value"] =  $propertyAccessor->getValue($item, $field["name"]);
 		}
 		catch (\Exception $e){
 			$fieldMetadata["value"] = null;

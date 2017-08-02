@@ -7,11 +7,11 @@ use Tide\TideCrudBundle\Helpers\CrudHelper;
 
 class CrudExtension extends \Twig_Extension
 {
-	private $crudHelper;
+	private $container;
 
 	public function __construct(ContainerInterface $container)
 	{
-		$this->crudHelper = $container->get("tidecrud.crud_helper");
+		$this->container = $container;
 	}
 
 
@@ -21,8 +21,8 @@ class CrudExtension extends \Twig_Extension
 		);
 	}
 
-	public function renderEntityField($item, $fieldMetadata){
-		return $this->crudHelper->renderEntityField($item, $fieldMetadata);
+	public function renderEntityField(\Twig_Environment $twig, $item, $fieldMetadata){
+		return $this->container->get("tidecrud.crud_helper")->renderEntityField($item, $fieldMetadata);
 	}
 
 
