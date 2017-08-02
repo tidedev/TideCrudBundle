@@ -11,7 +11,7 @@
         <tbody>
             {% for field in fields %}
                 <tr>
-                    <th>{{field.name|capitalize}}</th>
+                    <th>{{field.name|trans|capitalize}}</th>
                     <td> {{ renderEntityField(entity, field) }}</td>
                 </tr>
             {% endfor %}
