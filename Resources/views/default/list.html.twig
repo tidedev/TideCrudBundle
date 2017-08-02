@@ -19,7 +19,7 @@
                     <th data-field="id" data-visible="false">ID</th>
 
                     {% for field in fields %}
-                        <th data-sortable="true" data-field="{{ field.name }}">{{ field.name }}</th>
+                        <th data-sortable="true" data-field="{{ field.name }}">{{ field.name|capitalize }}</th>
                     {% endfor %}
                     <th>{{ "Actions"|trans  }}</th>
                 </tr>
