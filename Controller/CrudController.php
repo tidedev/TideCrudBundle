@@ -137,7 +137,7 @@ abstract class CrudController extends Controller
 					$em->persist( $entity );
 					$em->flush();
 					$this->postPersistNew($entity, $request);
-					return new JsonResponse( array( 'response' => 'success', 'message' => ucfirst($translator->trans($this->getEntityName())). $translator->trans('creado') ) );
+					return new JsonResponse( array( 'response' => 'success', 'message' => ucfirst($translator->trans($this->getEntityName()))." ".$translator->trans('creado') ) );
 				} else {
 					$errors = $this->get( 'tidecrud.form_serializer' )->serializeFormErrors( $form, true, true );
 					return new JsonResponse( array( 'response' => 'error', 'errors' => $errors ) );
