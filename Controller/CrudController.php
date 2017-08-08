@@ -15,6 +15,13 @@ use Symfony\Component\HttpFoundation\Response;
 abstract class CrudController extends Controller
 {
 
+    const DEFAULT_TEMPLATES = [
+    "list"=>"@TideCrud/default/list.html.twig",
+    "show"=>"@TideCrud/default/show.html.twig",
+    "new"=>"@TideCrud/default/new.html.twig",
+    "edit"=>"@TideCrud/default/edit.html.twig",
+    ];
+
 	/**
 	 * @return array
 	 */
@@ -46,7 +53,7 @@ abstract class CrudController extends Controller
 	 */
 	abstract function getRepository();
 
-	private function getFieldsMetadata($fields){
+	public function getFieldsMetadata($fields){
 		$fieldsArray = [];
 		foreach ($fields as $field){
 			$type = $this->getEntityManager()->getClassMetadata(get_class($this->getNewEntity()))->getTypeOfField($field);
@@ -56,18 +63,20 @@ abstract class CrudController extends Controller
 
 	}
 
+    /**
+     * @return array
+     */
+    public function getCustomTwigs(){
+        return [];
+    }
+
 	/**
 	 * @return array
 	 */
-	public function getCrudTwigs(){
-		$default = [
-			"list"=>"@TideCrud/default/list.html.twig",
-			"show"=>"@TideCrud/default/show.html.twig",
-			"new"=>"@TideCrud/default/new.html.twig",
-			"edit"=>"@TideCrud/default/edit.html.twig",
-		];
-		//return array_merge($default,$crudTwigs);
-		return $default;
+	private function getCrudTwigs(){
+
+	    $merge = array_merge(self::DEFAULT_TEMPLATES, $this->getCustomTwigs());
+		return $merge;
 	}
 
 	public function prePersistNew($entity, Request $request){
@@ -89,15 +98,15 @@ abstract class CrudController extends Controller
 	/**
 	 * @return \Doctrine\Common\Persistence\ObjectManager|object
 	 */
-	private function getEntityManager(){
+	public function getEntityManager(){
 		return $this->getDoctrine()->getManager();
 	}
 
-	private function getEntityName(){
+	public function getEntityName(){
 		return strtolower((new \ReflectionClass($this->getNewEntity()))->getShortName());
 	}
 
-	private function getEntityClassName(){
+	public function getEntityClassName(){
 		return (new \ReflectionClass($this->getNewEntity()))->getName();
 	}
 	/**
@@ -144,7 +153,11 @@ abstract class CrudController extends Controller
 				}
 
 			}
-		}
+		}else{
+		    if($form->isSubmitted()){
+		        $seenvio = "s";
+            }
+        }
 
 		return $this->render($this->getCrudTwigs()["new"], array(
 			'entity' => $entity,
