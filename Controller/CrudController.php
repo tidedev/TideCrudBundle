@@ -5,6 +5,7 @@ namespace Tide\TideCrudBundle\Controller;
 use Doctrine\Orm\EntityRepository;
 
 use Doctrine\ORM\QueryBuilder;
+use JMS\Serializer\SerializationContext;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 
@@ -131,10 +132,13 @@ abstract class CrudController extends Controller
 	}
 
 
-	public function newAction(Request $request)
+	public function newAction(Request $request, $options= null)
 	{
+	    if(!isset($options["form"]))
+	        $form = $this->getEntityFormClass();
+
 		$entity = $this->getNewEntity();
-		$form = $this->createForm($this->getEntityFormClass(), $entity, ["action"=>$this->generateUrl($this->getEntityName().'_new'), "method"=>"post"]);
+		$form = $this->createForm($form, $entity, ["action"=>$this->generateUrl($this->getEntityName().'_new'), "method"=>"post"]);
 		$form->handleRequest($request);
 		$translator = $this->get('translator');
 
@@ -146,18 +150,21 @@ abstract class CrudController extends Controller
 					$em->persist( $entity );
 					$em->flush();
 					$this->postPersistNew($entity, $request);
-					return new JsonResponse( array( 'response' => 'success', 'message' => ucfirst($translator->trans($this->getEntityName()))." ".$translator->trans('creado') ) );
+					$response = array( 'response' => 'success', 'message' => ucfirst($translator->trans($this->getEntityName()))." ".$translator->trans('creado') );
+					if(isset($options["returnEntity"]))
+                        //$response["entity"] = $entity;
+					    $response["entity"] = json_decode($this->get("serializer")->serialize($entity, 'json', SerializationContext::create()->setGroups(array('main'))));
+
+					if(isset($options["selectEntityId"]))
+					    $response["selectEntityId"] = $options["selectEntityId"];
+
+					return new JsonResponse($response);
 				} else {
 					$errors = $this->get( 'tidecrud.form_serializer' )->serializeFormErrors( $form, true, true );
 					return new JsonResponse( array( 'response' => 'error', 'errors' => $errors ) );
 				}
-
 			}
-		}else{
-		    if($form->isSubmitted()){
-		        $seenvio = "s";
-            }
-        }
+		}
 
 		return $this->render($this->getCrudTwigs()["new"], array(
 			'entity' => $entity,

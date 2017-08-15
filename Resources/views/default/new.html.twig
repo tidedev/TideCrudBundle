@@ -5,7 +5,7 @@
     {% endblock %}
 
     {% block body %}
-    {{ form_start(form, {'attr':{'data-remote':'true', 'data-method':'POST', 'data-url':form.vars.action, 'data-redirect':path('traveler_dashboard')~'#'~path(entityName~'_index')}}) }}
+    {{ form_start(form, {'attr':{'data-remote':'true', 'data-method':'POST', 'data-url':form.vars.action, 'data-redirect':form.vars.attr["data-redirect"]?:path('traveler_dashboard')~'#'~path(entityName~'_index')}}) }}
     {{ form_widget(form) }}
         <button type="submit" class="btn btn-primary">{{'Create'|trans}} {{entityName|trans}}<div class="ripple-container"></div></button>
     {{ form_end(form) }}
