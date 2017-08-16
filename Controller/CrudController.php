@@ -151,13 +151,7 @@ abstract class CrudController extends Controller
 					$em->flush();
 					$this->postPersistNew($entity, $request);
 					$response = array( 'response' => 'success', 'message' => ucfirst($translator->trans($this->getEntityName()))." ".$translator->trans('creado') );
-					if(isset($options["returnEntity"]))
-                        //$response["entity"] = $entity;
-					    $response["entity"] = json_decode($this->get("serializer")->serialize($entity, 'json', SerializationContext::create()->setGroups(array('main'))));
-
-					if(isset($options["selectEntityId"]))
-					    $response["selectEntityId"] = $options["selectEntityId"];
-
+                    $response["entity"] = json_decode($this->get("serializer")->serialize($entity, 'json', SerializationContext::create()->setGroups(array('main'))));
 					return new JsonResponse($response);
 				} else {
 					$errors = $this->get( 'tidecrud.form_serializer' )->serializeFormErrors( $form, true, true );
