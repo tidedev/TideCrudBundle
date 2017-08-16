@@ -84,13 +84,13 @@ class CrudHelper {
 
 		if(isset($filters["search"])){
 			if($filters["search"]){
-				$search = $this->getLastProperty($dql, $filters["search"]);
-				$dql = $this->createJoinsQueryBuilder($dql, ["folio","person.names","userOpc.person.names"]);
-				$this->findByString($dql,$search,$searchFields);
+				//$search = $this->getLastProperty($dql, $filters["search"]);
+				$dql = $this->createJoinsQueryBuilder($dql, $searchFields);
+				$this->findByString($dql,$filters["search"], $searchFields);
 			}
 		}
 
-		$paginator = new Paginator($dql, $fetchJoinCollection = true);
+		$paginator = new Paginator($dql, true);
 
 		return ["total"=>count($paginator), "rows"=>$dql->getQuery()->getResult()];
 	}
@@ -131,13 +131,14 @@ class CrudHelper {
 			$parent = $select;
 			for ($i=0;$i<$numParts-1;$i++) {
 				if ( $i != $numParts ) {
-
-					$joinParts = $dql->getDQLPart("join")[$select];
-					$exists = false;
-					foreach ($joinParts as $joinPart){
-						if($joinPart->getAlias()==$fieldParts[$i])
-							$exists = true;
-					}
+                    $exists = false;
+				    if(count($dql->getDQLPart("join"))>0) {
+                        $joinParts = $dql->getDQLPart("join")[$select];
+                        foreach ($joinParts as $joinPart) {
+                            if ($joinPart->getAlias() == $fieldParts[$i])
+                                $exists = true;
+                        }
+                    }
 
 					if(!$exists){
 						$insertedJoinsAlias[$fieldParts[$i]] = 1 + isset($insertedJoinsAlias[$fieldParts[$i]])?:$insertedJoinsAlias[$fieldParts[$i]];
@@ -173,6 +174,8 @@ class CrudHelper {
 		$conditions = [];
 		foreach ($searchFields as $field){
 			//foreach ($stringsToSearch as $str){
+            if(strpos($field, ".")==false)
+                $field = "entity.".$field;
 			$conditions[]=$dql->expr()->like($field, "'%$string%'");
 			//}
 		}

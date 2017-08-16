@@ -110,7 +110,26 @@ abstract class CrudController extends Controller
 	public function getEntityClassName(){
 		return (new \ReflectionClass($this->getNewEntity()))->getName();
 	}
-	/**
+
+
+    /*
+     * Search for entity selector
+     */
+    public function simpleFinderAction( Request $request, $searchFields = null, $dql = null) {
+        $query = $request->query->get("q");
+        $limit = $request->query->get("page_limit");
+        if(!$searchFields)
+            $searchFields = $this->getSearchFields();
+        $pagination = $this->get("tidecrud.crud_helper")->paginate($this->getEntityClassName(),$dql, ["search"=>$query, "limit"=>$limit], $searchFields);
+        $entitiesArray = [];
+        foreach ($pagination["rows"] as $entity){
+            $entitiesArray[] = ["id"=>$entity->getId(), "text"=>$entity->getSearchLabel()];
+        }
+        return new JsonResponse($entitiesArray);
+
+    }
+
+    /**
 	 * Lists all entities.
 	 */
 	public function listAction(Request $request, $responseType="html", QueryBuilder $customDql = null)
