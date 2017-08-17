@@ -17,10 +17,11 @@ abstract class CrudController extends Controller
 {
 
     const DEFAULT_TEMPLATES = [
-    "list"=>"@TideCrud/default/list.html.twig",
-    "show"=>"@TideCrud/default/show.html.twig",
-    "new"=>"@TideCrud/default/new.html.twig",
-    "edit"=>"@TideCrud/default/edit.html.twig",
+        "list"=>"@TideCrud/default/list.html.twig",
+        "show"=>"@TideCrud/default/show.html.twig",
+        "new"=>"@TideCrud/default/new.html.twig",
+        "edit"=>"@TideCrud/default/edit.html.twig",
+        "actions"=>"@TideCrud/default/fields/actions.html.twig"
     ];
 
 	/**
@@ -53,6 +54,7 @@ abstract class CrudController extends Controller
 	 * @return EntityRepository
 	 */
 	abstract function getRepository();
+
 
 	public function getFieldsMetadata($fields){
 		$fieldsArray = [];

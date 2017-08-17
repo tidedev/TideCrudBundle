@@ -26,6 +26,9 @@ class CrudHelper {
 	}
 
 	public function renderEntityField($item, $field){
+	    if($field=="actions")
+            return $this->templating->render(self::BASE_TWIGS."/fields/actions.html.twig", ["entityId"=>$item->getId(),"entityName"=>strtolower((new \ReflectionClass($item))->getShortName())]);
+
 		$propertyAccessor = $this->propertyAccessor;
 		try{
 			$fieldMetadata["value"] =  $propertyAccessor->getValue($item, $field);
@@ -46,7 +49,6 @@ class CrudHelper {
             }catch (\Exception $e){
                 throw new ExceptionCollection("You have to implement method toString in collection");
             }
-
         }
 
 		return $this->templating->render(self::BASE_TWIGS."/fields/".$fieldType.".html.twig", $fieldMetadata);
@@ -100,7 +102,7 @@ class CrudHelper {
 	}
 
 
-	public function tableSerialization($entities, $fields){
+	public function tableSerialization($entities, $fields, $showActions = true){
 		//$fields = ["id", "folio", "person.names", "lastStatusString", "campaign.name", "userOpc.username",  "userOperator.username", "assignedDate"];
 		$result = [];
 		foreach ($entities as $entity){
@@ -108,6 +110,8 @@ class CrudHelper {
 			foreach ($fields as $field){
 				$res[$field] = $this->renderEntityField($entity, $field);
 			}
+			if($showActions)
+                $res["actions"] = $this->renderEntityField($entity, "actions");
 			$result[] = $res;
 		}
 		return $result;
@@ -173,7 +177,7 @@ class CrudHelper {
             if($field != end($searchFields))
                 $composedLike .=",' ',";
 		}
-		$composedLike.=")";
+		$composedLike.=",'')";
         $conditions[]=$dql->expr()->like($composedLike, "'%$string%'");
 
 		$orX->addMultiple($conditions);

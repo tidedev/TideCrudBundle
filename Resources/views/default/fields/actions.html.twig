@@ -1,2 +1,2 @@
-<a class="loadinmodal" data-action=""><i class="fa fa-eye"></i></a>
-<a class="loader" data-action=""><i class="fa fa-edit"></i></a>
+<a class="loadinmodal" data-action="{{ path(entityName~'_show', { 'id': entityId }) }}"><i class="fa fa-eye"></i></a>
+<a class="loader" data-action="{{ path(entityName~'_edit', { 'id': entityId }) }}"><i class="fa fa-edit"></i></a>
