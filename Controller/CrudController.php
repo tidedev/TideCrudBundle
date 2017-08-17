@@ -115,7 +115,7 @@ abstract class CrudController extends Controller
     /*
      * Search for entity selector
      */
-    public function simpleFinderAction( Request $request, $searchFields = null, $dql = null) {
+    public function search( Request $request, $searchFields = null, $dql = null) {
         $query = $request->query->get("q");
         $limit = $request->query->get("page_limit");
         if(!$searchFields)
@@ -132,15 +132,18 @@ abstract class CrudController extends Controller
     /**
 	 * Lists all entities.
 	 */
-	public function listAction(Request $request, $responseType="html", QueryBuilder $customDql = null)
+	public function listAction(Request $request, $responseType="html", QueryBuilder $customDql = null, $searchFields = [])
 	{
-		$filters = $this->getRequestFilters($request);
-		$pagination = $this->get("tidecrud.crud_helper")->paginate($this->getEntityClassName(),$customDql, $filters);
 
-		if($responseType=="html"){
-			return $this->render($this->getCrudTwigs()["list"], array(
+        $filters = $this->getRequestFilters($request);
+        if(!$searchFields)
+            $searchFields = $this->getSearchFields();
+		$pagination = $this->get("tidecrud.crud_helper")->paginate($this->getEntityClassName(),$customDql, $filters, $searchFields);
+        if (0 !== strpos($request->headers->get('Content-Type'), 'application/json')) {
+            return $this->render($this->getCrudTwigs()["list"], array(
 				'entities' => $pagination["rows"],
 				'entityName' => $this->getEntityName(),
+				'fetchRoute' => $request->get('_route'),
 				'fields' => $this->getFieldsMetadata($this->getListFields())
 				));
 		}
@@ -251,15 +254,8 @@ abstract class CrudController extends Controller
 	}
 
 	private function  getRequestFilters(Request $request){
-		//todo: validar los filtros
+		//todo: validate filters
 		$filters = [];
-		/*
-	     * @QueryParam(name="order", description="Filter ballots by folio ASC or DESC", requirements="asc|desc", strict=true,nullable=true,  allowBlank=true, default="ASC")
-		 * @QueryParam(name="sort", description="Filter ballots by field ASC or DESC", strict=true,nullable=true,  allowBlank=true)
-		 * @QueryParam(name="limit", description="Limit the numer of users returned", requirements="\d+", strict=true,nullable=true,  allowBlank=true, default=null)
-		 * @QueryParam(name="offset", description="Start offset", requirements="\d+", strict=true,nullable=true,  allowBlank=true, default=null)
-		 * @QueryParam(name="search", description="Start offset", allowBlank=true, default=null)
-		 */
 		$filters["order"] = $request->query->get("order");
 		$filters["sort"] = $request->query->get("sort");
 		$filters["limit"] = $request->query->get("limit");

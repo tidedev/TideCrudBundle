@@ -57,14 +57,7 @@ class CrudHelper {
 			$dql = $this->createListQueryBuilder($entityClass);
 		}
 
-
-		$dql->setMaxResults(100);
-		/*
-		$dql->setMaxResults(100);
-		$filters["sort"] = "userOpc.person.location.address";
-		$filters["order"] = "DESC";
-		*/
-
+		$dql->setMaxResults(20);
 
 		if(isset($filters["limit"]))
 			$dql->setMaxResults($filters["limit"]);
@@ -84,7 +77,6 @@ class CrudHelper {
 
 		if(isset($filters["search"])){
 			if($filters["search"]){
-				//$search = $this->getLastProperty($dql, $filters["search"]);
 				$dql = $this->createJoinsQueryBuilder($dql, $searchFields);
 				$this->findByString($dql,$filters["search"], $searchFields);
 			}
@@ -168,21 +160,26 @@ class CrudHelper {
 	}
 
 	private function findByString(QueryBuilder $dql, $string, $searchFields){
-		//$fields = ["person.names", "person.mLastname", "person.pLastname"];
-		//$stringsToSearch = explode(" ", $string);
 		$orX = $dql->expr()->orX();
 		$conditions = [];
+		$composedLike = "CONCAT (";
 		foreach ($searchFields as $field){
-			//foreach ($stringsToSearch as $str){
             if(strpos($field, ".")==false)
-                $field = "entity.".$field;
-			$conditions[]=$dql->expr()->like($field, "'%$string%'");
-			//}
+                $fieldFormatted = "entity.".$field;
+            else
+                $fieldFormatted = $field;
+			$conditions[]=$dql->expr()->like($fieldFormatted, "'%$string%'");
+            $composedLike .= "COALESCE($fieldFormatted,'')";
+            if($field != end($searchFields))
+                $composedLike .=",' ',";
 		}
+		$composedLike.=")";
+        $conditions[]=$dql->expr()->like($composedLike, "'%$string%'");
+
 		$orX->addMultiple($conditions);
-		//return $dql->andWhere("person.names LIKE '%An%'");
 		return $dql->andWhere( $orX );
 	}
 
 
 }
+
