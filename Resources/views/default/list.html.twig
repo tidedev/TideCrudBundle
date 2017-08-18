@@ -1,13 +1,13 @@
 {% extends '@App/Common/baseAdminPannel.html.twig' %}
 
     {% block title %}
-        {{entityName|capitalize}}
+        {{entityName|trans|capitalize}}
     {% endblock %}
 
     {% block body %}
         <a class="loader" data-action="{{ path(entityName~'_new') }}">
             <button type="submit" class="btn btn-primary">
-                Crear {{entityName}}
+                Crear {{entityName|trans}}
                 <div class="ripple-container"></div>
             </button>
         </a>
@@ -32,7 +32,7 @@
                         {% if field.name == "id" %}
                             <th data-field="id" data-visible="false">ID</th>
                         {% else %}
-                            <th data-field="{{ field.name }}" data-sortable="true">{{ field.name|trans|capitalize }}</th>
+                            <th data-field="{{ field.name }}" data-sortable="{{ field.type ?'true':'false'}}">{{ field.name|trans|capitalize }}</th>
                         {% endif %}
                     {% endfor %}
                     <th data-field="actions" data-sortable="false">{{ "actions"|trans|capitalize }}</th>

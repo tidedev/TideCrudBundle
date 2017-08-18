@@ -55,16 +55,12 @@ abstract class CrudController extends Controller
 	 */
 	abstract function getRepository();
 
+	public function getFilterForm(){
+	    return null;
+    }
 
-	public function getFieldsMetadata($fields){
-		$fieldsArray = [];
-		foreach ($fields as $field){
-			$type = $this->getEntityManager()->getClassMetadata(get_class($this->getNewEntity()))->getTypeOfField($field);
-			$fieldsArray[] =["name"=>$field, "type"=>$type];
-		}
-		return $fieldsArray;
 
-	}
+
 
     /**
      * @return array
@@ -138,15 +134,36 @@ abstract class CrudController extends Controller
 	{
 
         $filters = $this->getRequestFilters($request);
+
+        /*
+         *         $filtersForm = [];
+
         if(!$searchFields)
             $searchFields = $this->getSearchFields();
-		$pagination = $this->get("tidecrud.crud_helper")->paginate($this->getEntityClassName(),$customDql, $filters, $searchFields);
+
+        if($filterForm = $this->getFilterForm()) {
+            $filterForm = $this->createForm($filterForm,null, ["action"=>$this->generateUrl($this->getEntityName().'_index'), "method"=>"get"]);
+            $filterForm->handleRequest($request);
+            if( $filterForm->isSubmitted() ) {
+                if ( $filterForm->isValid() ) {
+                    $filtersForm = $filterForm->getData();
+                }
+            }
+            $listParams["filterForm"] = $filterForm;
+        }
+
+         */
+
+        if(!$searchFields)
+            $searchFields = $this->getSearchFields();
+        $crudHelper = $this->get("tidecrud.crud_helper");
+		$pagination = $crudHelper->paginate($this->getEntityClassName(),$customDql, $filters, $searchFields);
         if (0 !== strpos($request->headers->get('Content-Type'), 'application/json')) {
             return $this->render($this->getCrudTwigs()["list"], array(
 				'entities' => $pagination["rows"],
 				'entityName' => $this->getEntityName(),
 				'fetchRoute' => $request->get('_route'),
-				'fields' => $this->getFieldsMetadata($this->getListFields())
+				'fields' => $crudHelper->getEntityFieldsMetadata($this->getNewEntity(),$this->getListFields())
 				));
 		}
 		else{
@@ -199,10 +216,11 @@ abstract class CrudController extends Controller
 	public function showAction($id)
 	{
 		$entity = $this->getRepository()->find($id);
+        $crudHelper= $this->get("tidecrud.crud_helper");
 		return $this->render($this->getCrudTwigs()["show"], array(
 			'entity' => $entity,
 			'entityName' => $this->getEntityName(),
-			'fields' => $this->getFieldsMetadata($this->getShowFields())
+			'fields' => $crudHelper->getEntityFieldsMetadata($this->getNewEntity(),$this->getListFields())
 		));
 	}
 
